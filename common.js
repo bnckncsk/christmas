@@ -5,7 +5,38 @@
 /**
  *  Lekérjük a tableselectort, és regisztrálunk egy change eseménykezelőt!
  */
+const selectionDiv = document.getElementById('tableselector');
+selectionDiv.addEventListener('change', function(e){
+    /**
+     * @type {HTMLInputElement}
+     */
+    const selectedButton = e.target;
 
+    /**
+     * @type {HTMLDivElement}
+     */
+    const htmlDiv = document.getElementById('htmlsection');
+
+    /**
+     * @type {HTMLDivElement}
+     */
+    const jsDiv = document.getElementById('jssection');
+
+    if ( selectedButton.checked ) {
+        /**
+         * @type {HTMLInputElement}
+         */
+        const selectedValue = selectedButton.value;
+
+        if (selectedValue == "htmlsection") {
+            htmlDiv.classList.remove('hide');
+            jsDiv.classList.add('hide');
+        } else{
+            jsDiv.classList.remove('hide');
+            htmlDiv.classList.add('hide');
+        }
+    }
+})
 
 
 /**
@@ -19,7 +50,15 @@
  * @returns {void}
  */
 function initCheckbox(checkboxElem){
+    changeCheckboxValue(checkboxElem);
 
+    checkboxElem.addEventListener('change', function(e){
+        /**
+         * @type {HTMLInputElement}
+         */
+        const checkbox = e.target;
+        changeCheckboxValue(checkbox);
+    })
 }
 
 /**
@@ -35,7 +74,32 @@ function initCheckbox(checkboxElem){
  * @returns {void}
  */
 function changeCheckboxValue(checkbox){
+    /**
+     * @type {HTMLDivElement}
+     */
+    const checkboxDiv = checkbox.parentElement;
+    /**
+     * @type {HTMLFormElement}
+     */
+    const jsForm = checkboxDiv.parentElement;
 
+    /**
+     * @type {HTMLInputElement}
+     */
+    const mano2 = jsForm.querySelector("#mano2");
+
+    /**
+     * @type {HTMLInputElement}
+     */
+    const muszak2 = jsForm.querySelector("#muszak2");
+
+    if (checkbox.checked) {
+        mano2.disabled = false;
+        muszak2.disabled = false;
+    } else{
+        mano2.disabled = true;
+        muszak2.disabled = true;
+    }
 }
 
 /**
@@ -69,6 +133,14 @@ function initSelect(arr) {
     const select = getSelectElement();
     select.innerHTML = '';
     createoption(select, "Válassz Manót!"); // ez a függvény még nincs implementálva, görgess lejjebb
+
+    for (let mano of arr) {
+        createoption(select, mano.who1, mano.who1);
+
+        if (mano.who2){
+            createoption(select, mano.who2, mano.who2);
+        }
+    }
 }
 
 /**
@@ -80,7 +152,10 @@ function initSelect(arr) {
  * @returns {void}
  */
 function createoption(selectElement, label, value = "") {
-
+    const option = document.createElement("option");
+    option.value = value;
+    option.innerText = label;
+    selectElement.appendChild(option);
 }
 
 /**
@@ -103,13 +178,21 @@ function createoption(selectElement, label, value = "") {
  * @returns {void}
  */
 function createNewElement(obj, form, array) {
+    const select = getSelectElement();
+    createoption(select, obj.who1, obj.who1);
 
+    if(obj.who2){
+        createoption(select, obj.who2, obj.who2);
+    }
+    
     // ez egy ismerős rész, ehhez nem kell nyúlni
     array.push(obj);
     renderTbody(array);
     form.reset();
     // ismerős rész vége
 
+    const mano2 = form.querySelector("#masodikmano");
+    changeCheckboxValue(mano2);
 }
 
 /**
@@ -126,6 +209,13 @@ function createNewElement(obj, form, array) {
  * @returns {string}
  */
 function mapMuszak(muszakValue){
+    if (muszakValue == "1"){
+        muszakValue = "Délelöttös";
+    } else if (muszakValue == "2") {
+        muszakValue = "Délutános";
+    } else {
+        muszakValue = "Éjszakai";
+    }
     console.log(muszakValue);
     return muszakValue;
 }
